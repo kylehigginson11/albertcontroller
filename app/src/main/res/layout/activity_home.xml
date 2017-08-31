@@ -2,21 +2,26 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="fill_parent"
-              android:background="#ffffff"
+              android:background="@color/background"
               android:gravity="top"
               android:orientation="vertical">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/titleTV"/>
+        android:layout_marginTop="20dp"
+        android:id="@+id/titleTV"
+        android:textSize="30sp"
+        android:text="@string/home_title"
+        android:layout_gravity="center"
+        android:textStyle="bold"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="110dp"
         android:layout_marginLeft="40dp"
         android:layout_marginRight="40dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="40dp"
         android:weightSum="2">
 
         <Button
@@ -24,12 +29,12 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#ff9a9a"
+            android:background="@color/button"
             android:gravity="center"
             android:padding="10dp"
             android:text="Avoid Obstacle"
             android:textAllCaps="false"
-            android:textColor="#ffffff"
+            android:textColor="@color/button_text"
             android:textSize="20sp"/>
 
         <Button
@@ -37,12 +42,12 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#ff9a9a"
+            android:background="@color/button"
             android:gravity="center"
             android:padding="10dp"
             android:text="Follow Object"
             android:textAllCaps="false"
-            android:textColor="#ffffff"
+            android:textColor="@color/button_text"
             android:textSize="20sp"/>
 
     </LinearLayout>
@@ -59,12 +64,12 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#ff9a9a"
+            android:background="@color/button"
             android:gravity="center"
             android:padding="10dp"
             android:text="Take Picture"
             android:textAllCaps="false"
-            android:textColor="#ffffff"
+            android:textColor="@color/button_text"
             android:textSize="20sp"/>
 
         <Button
@@ -72,12 +77,12 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#ff9a9a"
+            android:background="@color/button"
             android:gravity="center"
             android:padding="10dp"
             android:text="Stream Video"
             android:textAllCaps="false"
-            android:textColor="#ffffff"
+            android:textColor="@color/button_text"
             android:textSize="20sp"/>
     </LinearLayout>
 
@@ -93,12 +98,12 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#ff9a9a"
+            android:background="@color/button"
             android:gravity="center"
             android:padding="10dp"
             android:text="Take Control"
             android:textAllCaps="false"
-            android:textColor="#ffffff"
+            android:textColor="@color/button_text"
             android:textSize="20sp"/>
 
         <Button
@@ -106,23 +111,23 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#ff9a9a"
+            android:background="@color/button"
             android:gravity="center"
             android:padding="10dp"
             android:text="Power Off"
             android:textAllCaps="false"
-            android:textColor="#ffffff"
+            android:textColor="@color/button_text"
             android:textSize="20sp"/>
 
     </LinearLayout>
 
     <Button
-        android:id="@+id/stopButton"
+        android:id="@+id/conTestButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#ff9a9a"
+        android:background="@color/button"
         android:layout_gravity="center_horizontal"
-        android:text="Stop Process"
+        android:text="Test Connection"
         android:textAllCaps="false"
         android:textColor="#e7e7e7"
         android:textSize="20sp"

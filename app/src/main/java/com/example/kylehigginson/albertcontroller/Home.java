@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +24,7 @@ import java.util.UUID;
 
 public class Home extends AppCompatActivity {
 
-    Button avoidButton, followButton, controlButton, pictureButton, streamButton, offButton, stopButton;
+    Button avoidButton, followButton, controlButton, pictureButton, streamButton, offButton, conTestButton;
     TextView titleTV;
 
     BluetoothSocket mmSocket;
@@ -95,7 +96,7 @@ public class Home extends AppCompatActivity {
         pictureButton = (Button) findViewById(R.id.picButton);
         streamButton = (Button) findViewById(R.id.streamButton);
         offButton = (Button) findViewById(R.id.offButton);
-        stopButton = (Button) findViewById(R.id.stopButton);
+        conTestButton = (Button) findViewById(R.id.conTestButton);
         titleTV = (TextView)findViewById(R.id.titleTV);
 
         BluetoothManager mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
@@ -151,7 +152,9 @@ public class Home extends AppCompatActivity {
                                     //The variable data now contains our full command
                                     handler.post(new Runnable() {
                                         public void run() {
-                                            titleTV.setText(data);
+                                            if (data == "connected!"){
+                                                Toast.makeText(Home.this, "Alberto connected!", Toast.LENGTH_SHORT).show();
+                                            }
                                             Log.d("Data:", data);
                                         }
                                     });
@@ -246,12 +249,12 @@ public class Home extends AppCompatActivity {
         });
 
 
-        stopButton.setOnClickListener(new View.OnClickListener() {
+        conTestButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Perform action on temp button click
 
-                //connectToAlbert();
-                //new workerThread().execute("stop");
+                connectToAlbert();
+                new workerThread().execute("test");
 
             }
         });

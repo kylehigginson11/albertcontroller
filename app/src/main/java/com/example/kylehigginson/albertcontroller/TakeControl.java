@@ -21,7 +21,7 @@ import java.util.UUID;
 
 public class TakeControl extends AppCompatActivity {
 
-    Button upButton, downButton, leftButton, rightButton;
+    Button upButton, downButton, leftButton, rightButton, lookLeftButton, lookRightButton, lookCenterButton;
 
     BluetoothSocket mmSocket;
     BluetoothDevice mmDevice = null;
@@ -88,6 +88,9 @@ public class TakeControl extends AppCompatActivity {
         downButton = (Button)findViewById(R.id.downButton);
         leftButton = (Button)findViewById(R.id.leftButton);
         rightButton = (Button)findViewById(R.id.rightButton);
+        lookLeftButton = (Button)findViewById(R.id.lookLeftButton);
+        lookRightButton = (Button)findViewById(R.id.lookRightButton);
+        lookCenterButton = (Button)findViewById(R.id.lookCenterButton);
 
         BluetoothManager mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = mBluetoothManager.getAdapter();
@@ -217,6 +220,36 @@ public class TakeControl extends AppCompatActivity {
 
                 connectToAlbert();
                 new workerThread().execute("right");
+
+            }
+        });
+
+        lookLeftButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Perform action on temp button click
+
+                connectToAlbert();
+                new workerThread().execute("look_left");
+
+            }
+        });
+
+        lookRightButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Perform action on temp button click
+
+                connectToAlbert();
+                new workerThread().execute("look_right");
+
+            }
+        });
+
+        lookCenterButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Perform action on temp button click
+
+                connectToAlbert();
+                new workerThread().execute("look_center");
 
             }
         });

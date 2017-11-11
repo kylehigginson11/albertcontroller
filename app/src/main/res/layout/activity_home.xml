@@ -14,7 +14,8 @@
         android:textSize="30sp"
         android:text="@string/home_title"
         android:layout_gravity="center"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        android:textAlignment="center"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -73,14 +74,14 @@
             android:textSize="20sp"/>
 
         <Button
-            android:id="@+id/streamButton"
+            android:id="@+id/viewPicButton"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/button"
             android:gravity="center"
             android:padding="10dp"
-            android:text="Stream Video"
+            android:text="View Picture"
             android:textAllCaps="false"
             android:textColor="@color/button_text"
             android:textSize="20sp"/>

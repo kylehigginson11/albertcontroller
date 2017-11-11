@@ -1,89 +1,35 @@
 package com.example.kylehigginson.albertcontroller;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothManager;
-import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
+import android.content.SharedPreferences;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Set;
-import java.util.UUID;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
+
 
 public class Home extends AppCompatActivity {
 
-    Button avoidButton, followButton, controlButton, pictureButton, streamButton, offButton, conTestButton;
+    Button avoidButton, followButton, controlButton, pictureButton, viewPicButton, offButton, conTestButton;
     TextView titleTV;
-
-    BluetoothSocket mmSocket;
-    BluetoothDevice mmDevice = null;
-
-    final byte delimiter = 33;
-    int readBufferPosition = 0;
-
-    BluetoothAdapter mBluetoothAdapter;
-    InputStream mmInputStream;
-
-
-    public void connectToAlbert(){
-
-        Log.d("Connecting to Albert", "now");
-
-        UUID uuid = UUID.fromString("5c01c1ce-fe60-428a-8e68-0be0e8ed6b7a"); //Standard SerialPortService ID
-
-        try {
-            mmSocket = mmDevice.createRfcommSocketToServiceRecord(uuid);
-            Log.d("socket created", "now");
-        } catch (Exception e) {
-            Log.e("","Error creating socket");
-        }
-
-        try {
-            mmSocket.connect();
-            Log.d("","Connected");
-        } catch (IOException e) {
-            Log.e("",e.getMessage());
-            try {
-                Log.e("","trying fallback...");
-
-                mmSocket =(BluetoothSocket) mmDevice.getClass().getMethod("createRfcommSocket", new Class[] {int.class}).invoke(mmDevice,1);
-                mmSocket.connect();
-
-                Log.e("","Connected");
-            }
-            catch (Exception e2) {
-                Log.e("", "Couldn't establish Bluetooth connection!");
-            }
-        }
-    }
-
-
-    public void sendBtMsg(String msg2send) {
-
-        try {
-            String msg = msg2send;
-            //msg += "\n";
-            OutputStream mmOutputStream = mmSocket.getOutputStream();
-            mmOutputStream.write(msg.getBytes());
-
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-    }
+    int SCREEN_HEIGHT, SCREEN_WIDTH;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,105 +40,21 @@ public class Home extends AppCompatActivity {
         followButton = (Button) findViewById(R.id.followButton);
         controlButton = (Button) findViewById(R.id.controlButton);
         pictureButton = (Button) findViewById(R.id.picButton);
-        streamButton = (Button) findViewById(R.id.streamButton);
+        viewPicButton = (Button) findViewById(R.id.viewPicButton);
         offButton = (Button) findViewById(R.id.offButton);
         conTestButton = (Button) findViewById(R.id.conTestButton);
         titleTV = (TextView)findViewById(R.id.titleTV);
 
-        BluetoothManager mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        mBluetoothAdapter = mBluetoothManager.getAdapter();
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        SCREEN_HEIGHT = displayMetrics.heightPixels;
+        SCREEN_WIDTH = displayMetrics.widthPixels;
 
-        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-        if (pairedDevices.size() > 0) {
-            for (BluetoothDevice device : pairedDevices) {
-                if (device.getName().equals("raspberrypi")) //Note, you will need to change this to match the name of your device
-                {
-                    Log.e("Aquarium", device.getName());
-                    mmDevice = device;
-                    break;
-                }
-            }
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (!mBluetoothAdapter.isEnabled()) {
+            Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBluetooth, 0);
         }
-
-        final Handler handler = new Handler();
-
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-
-        final class workerThread extends AsyncTask<String, Void, Void> {
-
-            @Override
-            protected Void doInBackground(String... params) {
-
-                String btMsg = params[0];
-
-                sendBtMsg(btMsg);
-                while (!Thread.currentThread().isInterrupted()) {
-                    int bytesAvailable;
-                    boolean workDone = false;
-
-                    try {
-
-                        mmInputStream = mmSocket.getInputStream();
-                        bytesAvailable = mmInputStream.available();
-                        if (bytesAvailable > 0) {
-
-                            byte[] packetBytes = new byte[bytesAvailable];
-                            Log.e("Aquarium recv bt", "bytes available");
-                            byte[] readBuffer = new byte[1024];
-                            mmInputStream.read(packetBytes);
-
-                            for (int i = 0; i < bytesAvailable; i++) {
-                                byte b = packetBytes[i];
-                                if (b == delimiter) {
-                                    byte[] encodedBytes = new byte[readBufferPosition];
-                                    System.arraycopy(readBuffer, 0, encodedBytes, 0, encodedBytes.length);
-                                    final String data = new String(encodedBytes, "US-ASCII");
-                                    readBufferPosition = 0;
-
-                                    //The variable data now contains our full command
-                                    handler.post(new Runnable() {
-                                        public void run() {
-                                            if (data == "connected!"){
-                                                Toast.makeText(Home.this, "Alberto connected!", Toast.LENGTH_SHORT).show();
-                                            }
-                                            Log.d("Data:", data);
-                                        }
-                                    });
-
-                                    workDone = true;
-                                    break;
-
-
-                                } else {
-                                    readBuffer[readBufferPosition++] = b;
-                                }
-                            }
-
-                            if (workDone) {
-                                break;
-                            }
-
-                        }
-                    } catch (IOException | NullPointerException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                try{
-                    mmSocket.close();
-                    mmSocket = null;
-                    mmInputStream.close();
-                } catch (IOException e){
-                    Log.e("failed", "to close");
-                }
-            }
-        };
 
 
 
@@ -200,8 +62,7 @@ public class Home extends AppCompatActivity {
             public void onClick(View v) {
                 // Perform action on temp button click
 
-                connectToAlbert();
-                new workerThread().execute("avoid");
+                new MessageAlbert(Home.this).execute("avoid", "0");
 
             }
         });
@@ -212,9 +73,23 @@ public class Home extends AppCompatActivity {
             public void onClick(View v) {
                 // Perform action on temp button click
 
+                CharSequence colors[] = new CharSequence[] {"Red", "Blue", "Green"};
 
-                connectToAlbert();
-                new workerThread().execute("follow");
+                AlertDialog.Builder builder = new AlertDialog.Builder(Home.this);
+                builder.setTitle("Pick a Color to Follow");
+                builder.setItems(colors, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which == 0){
+                            new MessageAlbert(Home.this).execute("follow_red", "0");
+                        } else if (which == 1){
+                            new MessageAlbert(Home.this).execute("follow_blue", "0");
+                        } else if (which == 2){
+                            new MessageAlbert(Home.this).execute("follow_green", "0");
+                        }
+                    }
+                });
+                builder.show();
 
             }
         });
@@ -234,17 +109,46 @@ public class Home extends AppCompatActivity {
         pictureButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
-                //(new Thread(new workerThread("forward"))).start();
+                new MessageAlbert(Home.this).execute("picture", "1");
 
             }
         });
 
 
-        streamButton.setOnClickListener(new View.OnClickListener() {
+        viewPicButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                final ImageView imageView = new ImageView(Home.this);
+                SharedPreferences sharedPref = Home.this.getSharedPreferences("com.example.kylehigginson.albertcontroller", Context.MODE_PRIVATE);
+                String publicID = sharedPref.getString("pictureURL", "defaultValue");
+                String imageURL = String.format("http://res.cloudinary.com/dtumd2ht6/image/upload/w_%s/%s%s.jpg", SCREEN_WIDTH, publicID, "%21");
+                Log.d("imagURL", imageURL);
+                Picasso.with(Home.this)
+                        .load(imageURL)
+                        .placeholder(R.drawable.loading_animation)
+                        .into(imageView, new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                Dialog builder = new Dialog(Home.this);
+                                builder.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                                builder.getWindow().setBackgroundDrawable(
+                                        new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                                builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                    @Override
+                                    public void onDismiss(DialogInterface dialogInterface) {
+                                        Log.d("Dismissed:", "True");
+                                    }
+                                });
 
-                //(new Thread(new workerThread("forward"))).start();
-
+                                builder.addContentView(imageView, new RelativeLayout.LayoutParams(
+                                        ViewGroup.LayoutParams.MATCH_PARENT,
+                                        ViewGroup.LayoutParams.MATCH_PARENT));
+                                builder.show();
+                            }
+                            @Override
+                            public void onError() {
+                                Toast.makeText(Home.this, "Could not load progress pic for session", Toast.LENGTH_SHORT).show();
+                            }
+                        });
             }
         });
 
@@ -253,8 +157,7 @@ public class Home extends AppCompatActivity {
             public void onClick(View v) {
                 // Perform action on temp button click
 
-                connectToAlbert();
-                new workerThread().execute("test");
+                new MessageAlbert(Home.this).execute("test", "0");
 
             }
         });
@@ -268,11 +171,6 @@ public class Home extends AppCompatActivity {
             }
         });
 
-        // end light off button handler
-
-        if (!mBluetoothAdapter.isEnabled()) {
-            Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBluetooth, 0);
-        }
     }
+
 }
